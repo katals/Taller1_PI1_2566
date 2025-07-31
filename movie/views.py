@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
+from .models import Movie
+
 # Create your views here.
 
 def about(request):
@@ -11,4 +13,9 @@ def about(request):
 def home(request):
     #return HttpResponse("<h1>Welcome to the Movie Reviews Home Page!</h1>")
     #return render(request, 'home.html')  # Render the home.html template
-    return render(request, 'home.html', {'name': 'Juan Carlos Muñoz Trejos'})  # Render the home.html template with a title context
+    searchTerm = request.GET.get('searchMovie')
+    if searchTerm:
+        movies = Movie.objects.filter(title__icontains=searchTerm)  # Filter movies based on search term
+    else:
+        movies = Movie.objects.all()
+    return render(request, 'home.html', {'searchTerm': searchTerm, 'movies': movies})  # Render the home.html template with a title context and movie list
