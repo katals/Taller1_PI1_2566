@@ -8,4 +8,5 @@ def about(request):
 
 def home(request):
     #return HttpResponse("<h1>Welcome to the Movie Reviews Home Page!</h1>")
-    return render(request, 'home.html')  # Render the home.html template
+    #return render(request, 'home.html')  # Render the home.html template
+    return render(request, 'home.html', {'name': 'Juan Carlos Muñoz Trejos'})  # Render the home.html template with a title context
