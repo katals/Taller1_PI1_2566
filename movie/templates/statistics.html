@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Estadísticas</h1>
+    
+    <h2>Películas por Año</h2>
+    {% if graphic_year %}
+        <img src="data:image/png;base64,{{ graphic_year }}" alt="Gráfica de películas por año">
+    {% endif %}
+
+    <h2>Películas por Género</h2>
+    {% if graphic_genre %}
+        <img src="data:image/png;base64,{{ graphic_genre }}" alt="Gráfica de películas por género">
+    {% endif %}
+{% endblock content %}
