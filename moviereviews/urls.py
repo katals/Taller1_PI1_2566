@@ -27,7 +27,7 @@ urlpatterns = [
     path('news/', include('news.urls')),  # Home view for the news app, assuming it uses the same home view
     path('statistics/', movieViews.statistics_view, name='statistics'),  # Statistics view for the movie app
     path('signup/', movieViews.signup, name='signup'),  # Signup view for the movie app
-    path('recommend/', movieViews.recommend_movie, name='recommend_movie'),
+    path('recommend/', movieViews.recommend_movie, name='recommend'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
