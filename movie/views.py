@@ -8,6 +8,67 @@ from django.http import HttpResponse
 
 from .models import Movie
 
+import numpy as np
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
+
+# --- Función para calcular la similitud de coseno ---
+def cosine_similarity(a, b):
+    """Calcula la similitud de coseno entre dos vectores a y b."""
+    # Asegurarse de que los vectores no sean nulos para evitar división por cero
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return np.dot(a, b) / (norm_a * norm_b)
+
+# --- Función para generar el embedding de un texto ---
+def get_embedding(text):
+    """Genera un embedding para el texto dado usando la API de OpenAI."""
+    load_dotenv() # Carga las variables de entorno (tu API key)
+    client = OpenAI(api_key=os.environ.get('openai_apikey'))
+    
+    response = client.embeddings.create(
+        input=[text],
+        model="text-embedding-3-small" # Mismo modelo usado para las películas
+    )
+    return np.array(response.data[0].embedding, dtype=np.float32)
+
+# --- La vista principal para la página de recomendación ---
+def recommend_movie(request):
+    context = {} # El diccionario que pasaremos al template
+
+    if request.method == 'POST':
+        prompt = request.POST.get('prompt', '')
+        
+        if prompt:
+            # 1. Generar el embedding del prompt del usuario
+            prompt_emb = get_embedding(prompt)
+
+            # 2. Recorrer la BD y comparar
+            best_movie = None
+            max_similarity = -1  # Usamos -1 porque la similitud de coseno va de -1 a 1
+
+            for movie in Movie.objects.all():
+                # Convertir el embedding binario de la película a un array de numpy
+                movie_emb = np.frombuffer(movie.emb, dtype=np.float32)
+                
+                # Calcular la similitud
+                similarity = cosine_similarity(prompt_emb, movie_emb)
+
+                # Actualizar si encontramos una película más similar
+                if similarity > max_similarity:
+                    max_similarity = similarity
+                    best_movie = movie
+            
+            # 3. Preparar el contexto para mostrar el resultado
+            context['recommended_movie'] = best_movie
+            context['similarity_score'] = max_similarity
+            context['user_prompt'] = prompt
+
+    return render(request, 'recommend.html', context)
+
 # Create your views here.
 
 def about(request):
