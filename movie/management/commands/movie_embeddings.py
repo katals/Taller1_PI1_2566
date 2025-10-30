@@ -3,17 +3,16 @@ import numpy as np
 from django.core.management.base import BaseCommand
 from movie.models import Movie
 from openai import OpenAI
+from openai import OpenAI
 from dotenv import load_dotenv
 
 class Command(BaseCommand):
     help = "Generate and store embeddings for all movies in the database"
 
     def handle(self, *args, **kwargs):
-        # ✅ Load OpenAI API key
         load_dotenv()
         client = OpenAI(api_key=os.environ.get('openai_apikey'))
 
-        # ✅ Fetch all movies from the database
         movies = Movie.objects.all()
         self.stdout.write(f"Found {movies.count()} movies in the database")
 

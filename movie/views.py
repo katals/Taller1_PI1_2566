@@ -2,12 +2,9 @@ import matplotlib.pyplot as plt
 import matplotlib
 import io
 import urllib, base64
-
 from django.shortcuts import render
 from django.http import HttpResponse
-
 from .models import Movie
-
 import numpy as np
 import os
 from openai import OpenAI
@@ -34,17 +31,8 @@ def get_embedding(text):
         # Fallback a carga por defecto si settings no está disponible
         load_dotenv()
 
-    # Preferir OPENAI_API_KEY y caer a openai_apikey; eliminar comillas/espacios
-    api_key = os.getenv('OPENAI_API_KEY') or os.getenv('openai_apikey')
-    if api_key:
-        api_key = api_key.strip().strip('"').strip("'")
-
-    if not api_key:
-        raise RuntimeError(
-            "OpenAI API key no configurada. Define OPENAI_API_KEY (o openai_apikey) en tu .env junto a manage.py, sin comillas."
-        )
-
-    client = OpenAI(api_key=api_key)
+    load_dotenv()
+    client = OpenAI(api_key=os.environ.get('openai_apikey'))
     
     response = client.embeddings.create(
         input=[text],

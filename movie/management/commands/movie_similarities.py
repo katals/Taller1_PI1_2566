@@ -9,11 +9,8 @@ class Command(BaseCommand):
     help = "Compare two movies and optionally a prompt using OpenAI embeddings"
 
     def handle(self, *args, **kwargs):
-        # ✅ Load OpenAI API key
         load_dotenv()
-        # Prefer the standard name OPENAI_API_KEY, fall back to legacy 'openai_apikey'
-        api_key = os.getenv('OPENAI_API_KEY') or os.getenv('openai_apikey')
-        client = OpenAI(api_key=api_key)
+        client = OpenAI(api_key=os.environ.get('openai_apikey'))
 
         # ✅ Change these titles for any movies you want to compare
         movie1 = Movie.objects.get(title="Carmencita")

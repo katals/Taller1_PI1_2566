@@ -9,13 +9,9 @@ class Command(BaseCommand):
     help = "Generate images with OpenAI and update movie image field"
 
     def handle(self, *args, **kwargs):
-        # ✅ Load environment variables from the .env file
         load_dotenv()
-
-        # ✅ Initialize the OpenAI client with the API key
-        client = OpenAI(
-            api_key=os.environ.get('openai_apikey'),
-        )
+        client = OpenAI(api_key=os.environ.get('openai_apikey'))
+        
         # ✅ Folder to save images
         images_folder = 'media/movie/images/'
         os.makedirs(images_folder, exist_ok=True)
