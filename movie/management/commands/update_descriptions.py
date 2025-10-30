@@ -10,20 +10,16 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # ✅ Load environment variables from the .env file in the project root
         load_dotenv()
-
-        # ✅ Get the API key from environment variables
-        api_key = os.environ.get('openai_apikey')
-
-        # ✅ Add a check to ensure the API key was loaded successfully
+        # ✅ Get the API key from environment variables (prefer standard OPENAI_API_KEY, fallback to legacy openai_apikey)
+        api_key = (os.getenv('OPENAI_API_KEY') or os.getenv('openai_apikey') or '').strip()
+        # ✅ Validate API key presence
         if not api_key:
             self.stderr.write(self.style.ERROR(
-                "OpenAI API key not found. Make sure it's set in your 'openAI.env' file as 'openai_apikey'."
+                "OpenAI API key not found. Set OPENAI_API_KEY (or openai_apikey) in your .env next to manage.py, without quotes."
             ))
             return
-
         # ✅ Initialize the OpenAI client with the API key
         client = OpenAI(api_key=api_key)
-
         # ✅ Helper function to send prompt and get completion from OpenAI
         def get_completion(prompt, model="gpt-3.5-turbo"):
             messages = [{"role": "user", "content": prompt}]

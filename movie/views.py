@@ -12,6 +12,7 @@ import numpy as np
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
+from django.conf import settings
 
 # --- Función para calcular la similitud de coseno ---
 def cosine_similarity(a, b):
@@ -26,8 +27,24 @@ def cosine_similarity(a, b):
 # --- Función para generar el embedding de un texto ---
 def get_embedding(text):
     """Genera un embedding para el texto dado usando la API de OpenAI."""
-    load_dotenv() # Carga las variables de entorno (tu API key)
-    client = OpenAI(api_key=os.environ.get('openai_apikey'))
+    # Carga las variables de entorno (tu API key). Intenta usar BASE_DIR/.env
+    try:
+        load_dotenv(os.path.join(settings.BASE_DIR, ".env"))
+    except Exception:
+        # Fallback a carga por defecto si settings no está disponible
+        load_dotenv()
+
+    # Preferir OPENAI_API_KEY y caer a openai_apikey; eliminar comillas/espacios
+    api_key = os.getenv('OPENAI_API_KEY') or os.getenv('openai_apikey')
+    if api_key:
+        api_key = api_key.strip().strip('"').strip("'")
+
+    if not api_key:
+        raise RuntimeError(
+            "OpenAI API key no configurada. Define OPENAI_API_KEY (o openai_apikey) en tu .env junto a manage.py, sin comillas."
+        )
+
+    client = OpenAI(api_key=api_key)
     
     response = client.embeddings.create(
         input=[text],
